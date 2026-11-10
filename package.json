@@ -1,10 +1,9 @@
-
 {
-  "name": "todo-list_frontend",
+  "name": "todo-list_frontend_vanillajs",
   "version": "1.0.0",
-  "description": "Implementation of a frontend (Single Page Application) for a To-do list in plain JS.",
+  "description": "Implementation of a frontend (Single Page Application) for a To-do list in Vanilla JS.",
   "main": "index.js",
-  "scripts": 
+  "scripts":
   {
     "dev": "vite",
     "build": "vite build",
@@ -12,7 +11,7 @@
   },
   "author": "Ciro Pizza",
   "license": "MIT",
-  "devDependencies": 
+  "devDependencies":
   {
     "sass": "^1.99.0",
     "vite": "^8.0.10"
