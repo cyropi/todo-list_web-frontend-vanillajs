@@ -52,3 +52,95 @@ class TodoList extends HTMLElement
                        }
                     };
    }
+
+   
+   async fetchTodoItems()
+   {
+      let token = localStorage.getItem("token"); // Retrieve the token
+
+      let response = await fetch(ENV.API_URL + "/todos",
+                                 {
+                                    method: "GET",
+                                    headers: { Authorization: "Bearer " + token }, // Inject token
+                                 });
+
+      if (response.status === 401)
+      {
+         localStorage.removeItem("token"); // Destroy the invalid token
+
+         history.pushState("", "", "/login?error=unauthorized"); // Redirect with error flag
+         window.dispatchEvent(new Event("popstate"));
+
+         return null;
+      }
+
+      return response.json(); // parse JSON response into JS Objects
+   }
+
+
+   updateTodoList(list)
+   {
+      let todosArray = list.todos;
+
+      let ul = this.querySelector("#the-list");
+      ul.innerHTML = ""; // remove all child elements and re-create them. Not the most efficient thing to do.
+
+      for (let item of todosArray)
+      {
+         let li = document.createElement("li");
+         li.innerHTML = `${item.todo} <a href="#" data-delete="${item.id}">(delete)</a>`;
+
+         ul.append(li);
+      }
+
+      if (todosArray.length === 0)
+      {
+         let li = document.createElement("li");
+         li.innerHTML = "No to-do item to show.";
+
+         ul.append(li);
+      }
+
+      // add handlers for click on the delete links
+      ul.querySelectorAll("[data-delete]")
+        .forEach((deleteLink) =>
+                 {
+                    deleteLink.onclick = (event) =>
+                                         {
+                                            event.preventDefault();
+                                            let token = localStorage.getItem("token");
+
+                                            fetch(`${ENV.API_URL}/todos/${event.target.getAttribute("data-delete")}`,
+                                                  {
+                                                     method: "DELETE",
+                                                     mode: "cors",
+                                                     headers: { Authorization: "Bearer " + token },
+                                                  }).then(() =>
+                                                          {
+                                                             return this.fetchTodoItems();
+                                                          })
+                                                    .then((items) =>
+                                                          {
+                                                             this.updateTodoList(items);
+                                                          });
+                                         };
+                 });
+   }
+
+   
+   saveTodo(todoToSave)
+   {
+      let token = localStorage.getItem("token");
+
+      return fetch(ENV.API_URL + "/todos",
+                   {
+                      method: "POST",
+                      mode: "cors",
+                      headers: {
+                                  "Content-Type": "application/json",
+                                  Authorization: "Bearer " + token
+                               },
+                      body: JSON.stringify({ todo: todoToSave }),
+                   });
+   }
+}
