@@ -1,4 +1,3 @@
-
 import { ENV } from "../env.js";
 
 
@@ -87,3 +86,6 @@ class RegisterForm extends HTMLElement
       return response;
    }
 }
+
+
+customElements.define("register-form", RegisterForm);
